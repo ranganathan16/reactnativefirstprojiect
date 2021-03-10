@@ -5,7 +5,7 @@
  * @format
  * @flow strict-local
  */
-
+ import 'react-native-gesture-handler';
 import React, { useEffect } from 'react';
 import {
   SafeAreaView,
@@ -14,17 +14,17 @@ import {
   View,
   Text,
   StatusBar,
+  Button
 } from 'react-native';
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
 import SplashScreen from 'react-native-splash-screen'
-
+import { NavigationContainer } from '@react-navigation/native';
+import DrawerMenu from './routes/Drawer';
+import {
+  createDrawerNavigator,
+} from '@react-navigation/drawer';
+  
+const Drawer = createDrawerNavigator();
 const App: () => React$Node = () => {
 
   useEffect(() => {
@@ -33,10 +33,9 @@ const App: () => React$Node = () => {
 
   return (
     <>
-      
-      <SafeAreaView>
-      <View style={{flex:1}}><Text>sssss</Text></View>
-      </SafeAreaView>
+      <NavigationContainer>
+      <DrawerMenu />
+    </NavigationContainer> 
     </>
   );
 };
