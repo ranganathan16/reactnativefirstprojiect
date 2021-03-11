@@ -1,8 +1,8 @@
 import * as actionTypes from "./actionTypes";
 
-export const setData = (data) => {
+export const setProductData = (data) => {
   return {
-    type: actionTypes.SET_DATA,
+    type: actionTypes.SET_PRODUCT_LIST,
     data: data,
   };
 };

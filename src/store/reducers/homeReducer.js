@@ -1,20 +1,21 @@
 import * as actionTypes from "../actions/actionTypes";
 import { updateObject } from "../utility";
 const initialHomeState = {
- data:0
+ productlist:[],
+ 
 };
 
-const setData = (state, action) => {
+const setProductData = (state, action) => {
   return updateObject(state, {
-    data: action.data,
+    productlist: action.data,
   });
 };
 
 
 const homeReducer = (state = initialHomeState, action) => {
   switch (action.type) {
-    case actionTypes.SET_DATA:
-      return setData(state, action);
+    case actionTypes.SET_PRODUCT_LIST:
+      return setProductData(state, action);
     
     default:
       return state;

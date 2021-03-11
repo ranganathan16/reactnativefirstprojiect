@@ -9,8 +9,8 @@ const Stack = createStackNavigator();
 export default function Productstack() {
   return (
    
-      <Stack.Navigator initialRouteName="AddProduct" screenOptions={{headerShown:false}}>
-          <Stack.Screen name="ProductList" component={ProductList} />       
+      <Stack.Navigator initialRouteName="ProductList" screenOptions={{headerShown:false}}>
+          <Stack.Screen name="ProductList" component={ProductList} />
           <Stack.Screen name="AddProduct" component={AddProduct} />
       </Stack.Navigator>
 

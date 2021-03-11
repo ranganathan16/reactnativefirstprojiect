@@ -1,2 +1,2 @@
-export const SET_DATA = "SET_DATA";
+export const SET_PRODUCT_LIST = "SET_PRODUCT_LIST";
 

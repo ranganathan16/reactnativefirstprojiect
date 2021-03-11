@@ -1,4 +1,4 @@
 export {
-  setData,
+  setProductData,
   
 } from "./homeAction";
