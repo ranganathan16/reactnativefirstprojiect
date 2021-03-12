@@ -13,7 +13,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import * as actions from '../store/actions/index';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-export default function ProductList({navigation}) {
+export default function PurchaseList({navigation}) {
   const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = React.useState('');
   const productData = useSelector((state) => state.home.productlist);
