@@ -5,7 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert
+  Alert,
 } from 'react-native';
 import {Avatar, Card, Searchbar} from 'react-native-paper';
 
@@ -17,31 +17,39 @@ export default function ProductList({navigation}) {
   const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = React.useState('');
   const productData = useSelector((state) => state.home.productlist);
-const deleteHandler=(data)=>{
-let tempProductlist=[...productData];
-tempProductlist=tempProductlist.filter(p=>p.id!==data.id);
-console.log([...tempProductlist]);
-dispatch(actions.setProductData([...tempProductlist]));
-        Alert.alert("Deleted sucessfully");
-
-
-
-}
+  const deleteHandler = (data) => {
+    let tempProductlist = [...productData];
+    tempProductlist = tempProductlist.filter((p) => p.id !== data.id);
+    console.log([...tempProductlist]);
+    dispatch(actions.setProductData([...tempProductlist]));
+    Alert.alert('Deleted sucessfully');
+  };
 
   return (
     <View style={styles.container}>
       {productData && productData.length === 0 ? (
         <Text style={styles.empty}>No data found</Text>
-      ) : <Searchbar
-      placeholder="Search"
-      onChangeText={(text)=>setSearchQuery(text)}
-      value={searchQuery}
-    />}
+      ) : (
+        <Searchbar
+          placeholder="Search"
+          onChangeText={(text) => setSearchQuery(text)}
+          value={searchQuery}
+        />
+      )}
       <ScrollView style={styles.scroll}>
         {productData &&
           productData.map((ele, index) => {
             return (
-              <Card style={[styles.card,{display:ele.productName.includes(searchQuery)?'flex':'none'}]} key={index + 'product'}>
+              <Card
+                style={[
+                  styles.card,
+                  {
+                    display: ele.productName.includes(searchQuery)
+                      ? 'flex'
+                      : 'none',
+                  },
+                ]}
+                key={index + 'product'}>
                 <Card.Title
                   title={ele.productName}
                   right={(props) => (
@@ -51,17 +59,12 @@ dispatch(actions.setProductData([...tempProductlist]));
                         onPress={() =>
                           navigation.navigate('AddProduct', {editdata: ele})
                         }>
-                       
-                          <Icon name="edit" size={30} color="black" />
-                        
+                        <Icon name="edit" size={30} color="black" />
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.rightContentele}
-                        onPress={() =>
-                          deleteHandler(ele)
-                        }>
-                                          <Icon name="trash-o" size={30} color="red" />
-                       
+                        onPress={() => deleteHandler(ele)}>
+                        <Icon name="trash-o" size={30} color="red" />
                       </TouchableOpacity>
                     </View>
                   )}
@@ -98,8 +101,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginHorizontal: 3,
-    flexDirection:'row',
-   
+    flexDirection: 'row',
   },
   addIcon: {
     position: 'absolute',
@@ -115,7 +117,7 @@ const styles = StyleSheet.create({
   empty: {
     textAlign: 'center',
   },
-  rightContentele:{
-    marginHorizontal:4
-  }
+  rightContentele: {
+    marginHorizontal: 4,
+  },
 });
