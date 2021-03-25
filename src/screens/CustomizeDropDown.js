@@ -3,18 +3,22 @@ import {View, Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {Avatar, Card, Searchbar} from 'react-native-paper';
 
-export default function CustomizeDropDown({data, closeModal,productSelectHandler}) {
+export default function CustomizeDropDown({
+  data,
+  closeModal,
+  productSelectHandler,
+}) {
   const [searchQuery, setSearchQuery] = React.useState('');
 
   const renderItem = ({item}) => {
     return (
       <TouchableOpacity
         style={{
-          display: item.productName.includes(searchQuery) ? 'flex' : 'none',
+          display: item.product_name.includes(searchQuery) ? 'flex' : 'none',
         }}
         onPress={() => productSelectHandler(item)}>
         <Card style={styles.card}>
-          <Card.Title title={item.productName} />
+          <Card.Title title={item.product_name} />
         </Card>
       </TouchableOpacity>
     );
@@ -26,7 +30,7 @@ export default function CustomizeDropDown({data, closeModal,productSelectHandler
         <View>
           <Text style={styles.title}>Select Product</Text>
         </View>
-        <TouchableOpacity onPress={()=>closeModal()}>
+        <TouchableOpacity onPress={() => closeModal()}>
           <Icon name="close" size={30} color="black" />
         </TouchableOpacity>
       </View>
@@ -51,9 +55,9 @@ export default function CustomizeDropDown({data, closeModal,productSelectHandler
 
 const styles = StyleSheet.create({
   container: {
-      flex:1,
-    padding:10,
-    backgroundColor:'#f0f0f0'
+    flex: 1,
+    padding: 10,
+    backgroundColor: '#f0f0f0',
   },
   heading: {
     marginBottom: 20,

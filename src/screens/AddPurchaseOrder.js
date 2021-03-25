@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Text,
   View,
@@ -16,7 +16,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import * as actions from '../store/actions/index';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {DataTable} from 'react-native-paper';
-
+import firebase from 'firebase';
+import _ from 'lodash';
 import moment from 'moment';
 // import RNPickerSelect from 'react-native-picker-select';
 // import {Picker} from '@react-native-picker/picker';
@@ -26,7 +27,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default function AddPurchaseOrder(props) {
   const dispatch = useDispatch();
-  const productData = useSelector((state) => state.home.productlist);
+  // const productData = useSelector((state) => state.home.productlist);
 
   const [companyName, setcompanyName] = useState('');
   const [date, setDate] = useState(new Date());
@@ -34,9 +35,39 @@ export default function AddPurchaseOrder(props) {
   const [productList, setproductList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [editData, seteditData] = useState(null);
+  const [productData, setproductData] = useState([]);
+
+  useEffect(() => {
+    firebase
+      .database()
+      .ref('product')
+      .on('value', (data) => {
+        let tempData = _.map(data.val(), (val, id) => {
+          return {...val, id};
+        });
+
+        setproductData(tempData);
+      });
+
+    return () => {};
+  }, []);
 
   const addPurchaseHandler = () => {
     if (productList.length > 0 && companyName != '') {
+      let data = {
+        company_name: companyName,
+        date: moment(date).format('YYYY-MM-DD'),
+        product_list: [...productList],
+      };
+      console.log(data);
+      var purchaseListRef = firebase.database().ref('purchase');
+      var newPurchaseRef = purchaseListRef.push();
+      newPurchaseRef
+        .set({
+          ...data,
+        })
+        .then(() => {})
+        .catch(() => {});
     }
   };
 
@@ -46,11 +77,8 @@ export default function AddPurchaseOrder(props) {
       qty: qty,
       price: price,
     };
-    let tid = editData ? editData.id : 0;
     setproductList((p) => {
-      if (tid === 0) tid = p.length > 0 ? p[p.length - 1].id + 1 : 1;
-      else p = p.filter((p) => p.id !== editData.id);
-      return [...p, {id: tid, ...tempData}];
+      return [...p, {...tempData}];
     });
     setModalVisible(false);
     seteditData(null);
@@ -60,11 +88,12 @@ export default function AddPurchaseOrder(props) {
     tempProductList = tempProductList.filter((p) => p.id !== id);
     setproductList([...tempProductList]);
   };
+
   const renderItem = ({item}) => {
     return (
       <View style={styles.row}>
         <View style={[styles.cell, {flex: 4}]}>
-          <Text>{item.pname}</Text>
+          <Text>{item.product_name}</Text>
         </View>
         <View style={[styles.cell, {flex: 1}]}>
           <Text>{item.qty}</Text>
@@ -174,7 +203,7 @@ export default function AddPurchaseOrder(props) {
           <FlatList
             data={productList}
             renderItem={renderItem}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => item.product_id.toString()}
             //extraData={selectedId}
           />
           <Button

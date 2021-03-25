@@ -12,17 +12,35 @@ import {Avatar, Card, Searchbar} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import * as actions from '../store/actions/index';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import firebase from 'firebase';
+import _ from 'lodash';
 
 export default function ProductList({navigation}) {
   const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = React.useState('');
-  const productData = useSelector((state) => state.home.productlist);
+  const [productData, setproductData] = React.useState([]);
+  React.useEffect(() => {
+    firebase
+      .database()
+      .ref('product')
+      .on('value', (data) => {
+        let tempData = _.map(data.val(), (val, id) => {
+          return {...val, id};
+        });
+
+        setproductData(tempData);
+      });
+
+    return () => {};
+  }, []);
+
   const deleteHandler = (data) => {
-    let tempProductlist = [...productData];
-    tempProductlist = tempProductlist.filter((p) => p.id !== data.id);
-    console.log([...tempProductlist]);
-    dispatch(actions.setProductData([...tempProductlist]));
-    Alert.alert('Deleted sucessfully');
+    firebase
+      .database()
+      .ref(`product/${data.id}`)
+      .remove()
+      .then(() => {})
+      .catch(() => {});
   };
 
   return (
@@ -38,20 +56,20 @@ export default function ProductList({navigation}) {
       )}
       <ScrollView style={styles.scroll}>
         {productData &&
-          productData.map((ele, index) => {
+          productData.map((ele) => {
             return (
               <Card
                 style={[
                   styles.card,
                   {
-                    display: ele.productName.includes(searchQuery)
+                    display: ele.product_name.includes(searchQuery)
                       ? 'flex'
                       : 'none',
                   },
                 ]}
-                key={index + 'product'}>
+                key={ele.id + 'product'}>
                 <Card.Title
-                  title={ele.productName}
+                  title={ele.product_name}
                   right={(props) => (
                     <View style={styles.rightContent}>
                       <TouchableOpacity

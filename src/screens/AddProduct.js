@@ -3,65 +3,46 @@ import {Text, View, StyleSheet, TextInput, Button, Alert} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 import * as actions from '../store/actions/index';
+import firebase from 'firebase';
 
 export default function AddProduct(props) {
-  const dispatch = useDispatch();
-  const editdata=props.route.params?props.route.params.editdata:null;
-  const productData = useSelector((state) => state.home.productlist);
+  const editdata = props.route.params ? props.route.params.editdata : null;
+  const [productName, setProductName] = React.useState(
+    editdata ? editdata.product_name : '',
+  );
 
-  const [productName, setProductName] = React.useState(editdata?editdata.productName:'');
- 
-  const addHandler = () => {
-    const tempproductData = [...productData];
-    let isempty=productName.trim()==="";
-    let index;
-    if(editdata){
-       index=tempproductData.findIndex(ele=>ele.productName.toLowerCase().trim()===productName.toLowerCase().trim() && ele.id !==editdata.id);
-       if(index===-1 && !isempty)
-       {
-         let tempIndex=tempproductData.findIndex(p=>p.id===editdata.id);
-
-        tempproductData[tempIndex].productName=productName;
-        dispatch(actions.setProductData([...tempproductData]));
-        Alert.alert("Product updated sucessfully");
-       }
-       else{
-        Alert.alert(isempty?"enter the producr name":"product name already exits");
-       }
-
+  const submitHandler = () => {
+    let data;
+    if (editdata) {
+      data = {
+        product_name: productName,
+      };
+      var productEditRef = firebase.database().ref(`product/${editdata.id}`);
+      productEditRef
+        .update({
+          ...data,
+        })
+        .then(() => {})
+        .catch(() => {});
+    } else {
+      data = {
+        product_name: productName,
+        avalible: 0,
+      };
+      var postListRef = firebase.database().ref('product');
+      var newPostRef = postListRef.push();
+      newPostRef
+        .set({
+          ...data,
+        })
+        .then(() => {})
+        .catch(() => {});
     }
-    else{
-   
-     index=tempproductData.findIndex(ele=>ele.productName.toLowerCase().trim()===productName.toLowerCase().trim())
-    if(index===-1 && !isempty)
-    {
-    let maxid =
-      tempproductData.length > 0
-        ? tempproductData.reduce(
-            (max, p) => (p.id > max ? p.id : max),
-            tempproductData[0].id,
-          )
-        : 0;
-    maxid = maxid + 1;
-    let data = {
-      id: maxid,
-      productName,
-      avalible: 0,
-    };
-    console.log([...tempproductData, data]);
-    dispatch(actions.setProductData([...tempproductData, data]));
-    Alert.alert("Product added sucessfully");
-    setProductName("");
-  }
-  else{
-    Alert.alert(isempty?"enter the producr name":"product name already exits")
-  }
-}
   };
   return (
     <View style={styles.container}>
       <View>
-        <Text style={styles.title}>{editdata?"Edit":"Add"} Product</Text>
+        <Text style={styles.title}>{editdata ? 'Edit' : 'Add'} Product</Text>
       </View>
       <View>
         <TextInput
@@ -70,7 +51,10 @@ export default function AddProduct(props) {
           value={productName}
           onChangeText={(text) => setProductName(text)}
         />
-        <Button title={editdata?"Update":"Add"} onPress={() => addHandler()} />
+        <Button
+          title={editdata ? 'Update' : 'Add'}
+          onPress={() => submitHandler()}
+        />
       </View>
     </View>
   );

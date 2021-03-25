@@ -13,23 +13,31 @@ import CustomizeDropDown from './CustomizeDropDown';
 // import SearchableDropdown from 'react-native-searchable-dropdown';
 // import RNPicker from "rn-modal-picker";
 
-export default function AddPurchaseProduct({productData,closeHandler,addProductHandler,editData}) {
+export default function AddPurchaseProduct({
+  productData,
+  closeHandler,
+  addProductHandler,
+  editData,
+}) {
   const [dropdownVisible, setdropdownVisible] = useState(false);
-  const [selectedProduct, setselectedProduct] = useState(editData?{pid:editData.pid,pname:editData.pname}:null);
-  const [qty, setqty] = useState(editData?editData.qty:"");
-  const [price, setprice] = useState(editData?editData.price:"");
-   
+  const [selectedProduct, setselectedProduct] = useState(
+    editData
+      ? {product_id: editData.product_id, product_name: editData.product_name}
+      : null,
+  );
+  const [qty, setqty] = useState(editData ? editData.qty : '');
+  const [price, setprice] = useState(editData ? editData.price : '');
+
   const productSelectHandler = (item) => {
-    setselectedProduct({pid:item.id,pname:item.productName});
+    setselectedProduct({product_id: item.id, product_name: item.product_name});
     setdropdownVisible(false);
   };
-  const submitHandler=()=>{
-    if(selectedProduct && qty > 0 && price > 0) 
-    {
-      addProductHandler(selectedProduct,qty,price)
+  const submitHandler = () => {
+    if (selectedProduct && qty > 0 && price > 0) {
+      addProductHandler(selectedProduct, qty, price);
     }
-  }
-  
+  };
+
   return (
     <>
       <View style={styles.container}>
@@ -37,7 +45,7 @@ export default function AddPurchaseProduct({productData,closeHandler,addProductH
           <View>
             <Text style={styles.title}>Title</Text>
           </View>
-          <TouchableOpacity onPress={()=>closeHandler()}>
+          <TouchableOpacity onPress={() => closeHandler()}>
             <Icon name="close" size={30} color="black" />
           </TouchableOpacity>
         </View>
@@ -48,7 +56,9 @@ export default function AddPurchaseProduct({productData,closeHandler,addProductH
             style={styles.dropdown}
             onPress={() => setdropdownVisible(true)}>
             <Text>
-              {selectedProduct ? selectedProduct.pname : 'Select product'}
+              {selectedProduct
+                ? selectedProduct.product_name
+                : 'Select product'}
             </Text>
           </TouchableOpacity>
           <Text style={styles.lable}>Quantity</Text>
@@ -67,7 +77,11 @@ export default function AddPurchaseProduct({productData,closeHandler,addProductH
             value={price.toString()}
             onChangeText={(text) => setprice(text)}
           />
-          <Button title="Submit" onPress={() => {submitHandler()}}></Button>
+          <Button
+            title="Submit"
+            onPress={() => {
+              submitHandler();
+            }}></Button>
         </View>
       </View>
       <Modal
@@ -90,9 +104,8 @@ export default function AddPurchaseProduct({productData,closeHandler,addProductH
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding:10,
-    backgroundColor:'#f0f0f0'
-    
+    padding: 10,
+    backgroundColor: '#f0f0f0',
   },
   heading: {
     marginBottom: 20,
