@@ -27,7 +27,6 @@ export default function ProductList({navigation}) {
         let tempData = _.map(data.val(), (val, id) => {
           return {...val, id};
         });
-
         setproductData(tempData);
       });
 

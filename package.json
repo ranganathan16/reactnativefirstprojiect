@@ -23,6 +23,7 @@
     "firebase": "^8.3.1",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
+    "native-base": "^2.13.0",
     "react": "16.13.1",
     "react-native": "0.63.4",
     "react-native-af-video-player": "^0.2.1",

@@ -28,13 +28,14 @@ export default function AddPurchaseProduct({
   const [qty, setqty] = useState(editData ? editData.qty : '');
   const [price, setprice] = useState(editData ? editData.price : '');
 
-  const productSelectHandler = (item) => {
+  const productSelectHandler = item => {
     setselectedProduct({product_id: item.id, product_name: item.product_name});
     setdropdownVisible(false);
   };
   const submitHandler = () => {
     if (selectedProduct && qty > 0 && price > 0) {
-      addProductHandler(selectedProduct, qty, price);
+      let index = editData ? editData.index : -1;
+      addProductHandler(selectedProduct, qty, price, index);
     }
   };
 
@@ -67,7 +68,7 @@ export default function AddPurchaseProduct({
             style={styles.textinput}
             placeholder="Enter quantity"
             value={qty.toString()}
-            onChangeText={(text) => setqty(text)}
+            onChangeText={text => setqty(text)}
           />
           <Text style={styles.lable}>Total price</Text>
           <TextInput
@@ -75,13 +76,14 @@ export default function AddPurchaseProduct({
             style={styles.textinput}
             placeholder="Enter quantity"
             value={price.toString()}
-            onChangeText={(text) => setprice(text)}
+            onChangeText={text => setprice(text)}
           />
           <Button
             title="Submit"
             onPress={() => {
               submitHandler();
-            }}></Button>
+            }}
+          />
         </View>
       </View>
       <Modal

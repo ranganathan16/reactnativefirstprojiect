@@ -28,11 +28,19 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 export default function AddPurchaseOrder(props) {
   const dispatch = useDispatch();
   // const productData = useSelector((state) => state.home.productlist);
-
-  const [companyName, setcompanyName] = useState('');
-  const [date, setDate] = useState(new Date());
+  const editPurchasedata = props.route.params
+    ? props.route.params.editPurchasedata
+    : null;
+  const [companyName, setcompanyName] = useState(
+    editPurchasedata ? editPurchasedata.company_name : '',
+  );
+  const [date, setDate] = useState(
+    editPurchasedata ? new Date(editPurchasedata.date) : new Date(),
+  );
   const [showDate, setShowDate] = useState(false);
-  const [productList, setproductList] = useState([]);
+  const [productList, setproductList] = useState(
+    editPurchasedata ? editPurchasedata.product_list : [],
+  );
   const [modalVisible, setModalVisible] = useState(false);
   const [editData, seteditData] = useState(null);
   const [productData, setproductData] = useState([]);
@@ -41,11 +49,10 @@ export default function AddPurchaseOrder(props) {
     firebase
       .database()
       .ref('product')
-      .on('value', (data) => {
+      .on('value', data => {
         let tempData = _.map(data.val(), (val, id) => {
           return {...val, id};
         });
-
         setproductData(tempData);
       });
 
@@ -59,37 +66,59 @@ export default function AddPurchaseOrder(props) {
         date: moment(date).format('YYYY-MM-DD'),
         product_list: [...productList],
       };
-      console.log(data);
-      var purchaseListRef = firebase.database().ref('purchase');
-      var newPurchaseRef = purchaseListRef.push();
-      newPurchaseRef
-        .set({
-          ...data,
-        })
-        .then(() => {})
-        .catch(() => {});
+      if (editPurchasedata) {
+        var editPurchaseOrderRef = firebase
+          .database()
+          .ref(`purchase/${editPurchasedata.id}`);
+        editPurchaseOrderRef
+          .update({
+            ...data,
+          })
+          .then(() => {})
+          .catch(() => {});
+      } else {
+        var addPurchaseOrderRef = firebase.database().ref('purchase');
+        var newPurchaseRef = addPurchaseOrderRef.push();
+        newPurchaseRef
+          .set({
+            ...data,
+          })
+          .then(() => {})
+          .catch(() => {});
+      }
     }
   };
 
-  const addProductHandler = (pdata, qty, price) => {
+  const addProductHandler = (pdata, qty, price, index) => {
     let tempData = {
       ...pdata,
-      qty: qty,
+      qty: parseInt(qty),
       price: price,
     };
-    setproductList((p) => {
-      return [...p, {...tempData}];
-    });
+
+    if (index === -1) {
+      setproductList(p => {
+        return [...p, {...tempData}];
+      });
+    } else {
+      setproductList(p => {
+        p[index] = {...tempData};
+        return [...p];
+      });
+    }
+
     setModalVisible(false);
     seteditData(null);
   };
-  const RemoveProductHandler = (id) => {
+  const RemoveProductHandler = index => {
     let tempProductList = [...productList];
-    tempProductList = tempProductList.filter((p) => p.id !== id);
+    tempProductList = _.remove(tempProductList, (val, ind) => {
+      return ind !== index;
+    });
     setproductList([...tempProductList]);
   };
 
-  const renderItem = ({item}) => {
+  const renderItem = ({item, index}) => {
     return (
       <View style={styles.row}>
         <View style={[styles.cell, {flex: 4}]}>
@@ -102,7 +131,7 @@ export default function AddPurchaseOrder(props) {
           <Text>{item.price}</Text>
         </View>
         <TouchableOpacity
-          onPress={() => RemoveProductHandler(item.id)}
+          onPress={() => RemoveProductHandler(index)}
           style={{
             width: 25,
             height: 25,
@@ -114,7 +143,7 @@ export default function AddPurchaseOrder(props) {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => seteditData(item)}
+          onPress={() => seteditData({...item, index})}
           style={{
             width: 25,
             height: 25,
@@ -144,7 +173,7 @@ export default function AddPurchaseOrder(props) {
             style={styles.textinput}
             placeholder="Enter product"
             value={companyName}
-            onChangeText={(text) => setcompanyName(text)}
+            onChangeText={text => setcompanyName(text)}
           />
           <Text style={styles.lable}>Date</Text>
           <TouchableOpacity
@@ -203,13 +232,14 @@ export default function AddPurchaseOrder(props) {
           <FlatList
             data={productList}
             renderItem={renderItem}
-            keyExtractor={(item) => item.product_id.toString()}
+            keyExtractor={item => item.product_id.toString()}
             //extraData={selectedId}
           />
           <Button
             title={'Save'}
             disabled={productList && productList.length < 1}
-            onPress={() => addPurchaseHandler()}></Button>
+            onPress={() => addPurchaseHandler()}
+          />
         </View>
       </View>
       <Modal
